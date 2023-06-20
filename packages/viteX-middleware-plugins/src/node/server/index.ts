@@ -12,6 +12,7 @@ export interface ViteDevServer {
 
 export async function createServer() {
   const config = await resolveConfig();
+  console.log(config);
 
   const plugins = [...(config.plugins || []), ...loadInternalPlugins()];
   const app = connect();
@@ -24,6 +25,7 @@ export async function createServer() {
   };
 
   for (const plugin of plugins) {
+    // 注册中间件
     plugin?.configureServer?.(server);
   }
 

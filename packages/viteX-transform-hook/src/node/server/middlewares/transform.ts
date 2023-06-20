@@ -21,7 +21,7 @@ export function transformMiddleware(server: ViteDevServer): NextHandleFunction {
       // 遍历所有的插件
       for (const plugin of server.plugins) {
         if (!plugin.transform) continue;
-        let result: TransformResult;
+        let result: TransformResult = undefined;
         try {
           result = await plugin.transform(code, url);
         } catch (e) {

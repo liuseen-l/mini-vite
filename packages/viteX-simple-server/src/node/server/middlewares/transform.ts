@@ -5,7 +5,6 @@ import path from 'path';
 import { readFile } from 'fs-extra';
 import { getCodeWithSourcemap } from '../sourcemap';
 
-
 export async function doTransform(url: string) {
   // 获取文件类型
   const extname = path.extname(url).slice(1);
@@ -27,7 +26,6 @@ export async function doTransform(url: string) {
   };
 }
 
-
 export function transformMiddleware(): NextHandleFunction {
   return async function viteTransformMiddleware(req, res, next) {
     // 只处理get请求
@@ -36,19 +34,19 @@ export function transformMiddleware(): NextHandleFunction {
     }
 
     const url: string = req.url!;
-·
-    // 判断是否是ts或者js
+
+    // 判断是否是ts js jsx tsx
     if (isJSRequest(url)) {
       const result = await doTransform(url);
       if (result) {
         // const code = result.code;
         const code = getCodeWithSourcemap(result.code, result.map);
         res.setHeader('Content-Type', 'application/javascript');
+        // 处理完直接就返回了
         return res.end(code);
       }
     }
-
+    // 如果是css交给下一个中间件
     next();
   };
 }
-

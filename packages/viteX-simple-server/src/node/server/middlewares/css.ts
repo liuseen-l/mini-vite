@@ -22,6 +22,13 @@ export function cssMiddleware(): NextHandleFunction {
       });
 
       res.setHeader('Content-Type', 'application/javascript');
+      //       return res.end(`
+      //   var style = document.createElement('style')
+      //   style.setAttribute('type', 'text/css')
+      //   style.innerHTML = \`${rawCode} \`
+      //   document.head.appendChild(style)
+      // `);
+
       return res.end(`
         var style = document.createElement('style')
         style.setAttribute('type', 'text/css')
