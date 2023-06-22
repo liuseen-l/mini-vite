@@ -1,10 +1,11 @@
-import { NextHandleFunction } from 'connect';
+import type { NextHandleFunction } from 'connect'
+
 // 一个用于加载静态资源的中间件
-import sirv from 'sirv';
+import sirv from 'sirv'
 
 export function staticMiddleware(): NextHandleFunction {
-  const serveFromRoot = sirv('./', { dev: true });
+  const serveFromRoot = sirv('./', { dev: true })
   return async (req, res, next) => {
-    serveFromRoot(req, res, next);
-  };
+    serveFromRoot(req, res, next)
+  }
 }

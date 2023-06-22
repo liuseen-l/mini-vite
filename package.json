@@ -2,13 +2,14 @@
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "lint": "eslint --ext .vue,.js,.jsx,.ts,.tsx ./ --max-warnings 0",
-    "lint:fix": "eslint --ext .vue,.js,jsx,.ts,.tsx ./ --max-warnings 0 --fix",
+    "lint": "eslint --ext .vue,.js,.jsx,.ts,.tsx ./ ",
+    "lint:fix": "eslint --ext .vue,.js,jsx,.ts,.tsx ./ --fix",
     "stylelint": "stylelint **/*.{html,vue,sass,less} --allow-empty-input",
     "stylelint:fix": "stylelint --fix **/*.{html,vue,vss,sass,less} --allow-empty-input",
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@antfu/eslint-config": "^0.39.5",
     "@babel/core": "^7.22.5",
     "@commitlint/cli": "^16.3.0",
     "@commitlint/config-conventional": "^16.2.4",
@@ -39,8 +40,7 @@
   "lint-staged": {
     "*.{js,jsx,vue,ts,tsx}": [
       "prettier --write",
-      "npm run lint:fix",
-      "git add ."
+      "npm run lint:fix"
     ]
   },
   "description": "<p style=\"display:flex; justify-content: center\">",

@@ -1,23 +1,24 @@
-import { Plugin } from './server';
-import { resolve } from 'path';
-import { pathToFileURL } from 'url';
+import { resolve } from 'node:path'
+import { pathToFileURL } from 'node:url'
+import type { Plugin } from './server'
+
 export interface UserConfig {
-  root?: string;
-  plugins?: Plugin[];
+  root?: string
+  plugins?: Plugin[]
 }
 
-export type UserConfigExport = UserConfig | Promise<UserConfig>;
+export type UserConfigExport = UserConfig | Promise<UserConfig>
 
 export function defineConfig(config: UserConfigExport) {
-  return config;
+  return config
 }
 
 export type ResolvedConfig = Readonly<{
-  plugins?: Plugin[];
-}>;
+  plugins?: Plugin[]
+}>
 
 export async function resolveConfig(): Promise<ResolvedConfig> {
-  const configFilePath = pathToFileURL(resolve(process.cwd(), './vite.config.js'));
-  const config = await import(configFilePath.href);
-  return config.default.default;
+  const configFilePath = pathToFileURL(resolve(process.cwd(), './vite.config.js'))
+  const config = await import(configFilePath.href)
+  return config.default.default
 }

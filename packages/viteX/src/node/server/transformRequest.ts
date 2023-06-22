@@ -1,71 +1,58 @@
-import type { ViteDevServer } from '.';
-import { readFile } from 'fs-extra';
+import { readFile } from 'fs-extra'
+import type { ViteDevServer } from '.'
 
-export function transformRequest(
-  url: string,
-  server: ViteDevServer,
-) {
-  const request = doTransform(url, server);
-  return request;
+export function transformRequest(url: string, server: ViteDevServer) {
+  const request = doTransform(url, server)
+  return request
 }
 
-async function doTransform(
-  url: string,
-  server: ViteDevServer,
-) {
-  const { pluginContainer } = server;
+async function doTransform(url: string, server: ViteDevServer) {
+  const { pluginContainer } = server
   // const module = await server.moduleGraph.getModuleByUrl(url, ssr)
 
   // 原则上需要通过判断当前的模块是不是第三方模块才执行resolveId,但在这里我们都执行了
-  const resolved = (await pluginContainer!.resolveId(url, undefined)) ?? undefined;
-  const result = loadAndTransform(
-    url,
-    server,
-    resolved,
-  );
-  return result;
+  const resolved = (await pluginContainer!.resolveId(url, undefined)) ?? undefined
+  const result = loadAndTransform(url, server, resolved)
+  return result
 }
 
-async function loadAndTransform(
-  url: string,
-  server: ViteDevServer,
-  resolved?: string,
+async function loadAndTransform(url: string, server: ViteDevServer, resolved?: string) {
+  const { pluginContainer } = server
 
-) {
-  const { pluginContainer, } = server;
-
-  let code: string | null = null;
-  const fileUrl = resolved ? resolved : url;
+  let code: string | null = null
+  const fileUrl = resolved || url
 
   // 传入解析文件的路径，看用户是否需要对该路径的文件内容做出更改
-  const loadResult = await pluginContainer!.load(fileUrl);
+  const loadResult = await pluginContainer!.load(fileUrl)
 
   // 如果内容为空，那么直接读取
   if (loadResult === null) {
     try {
       // 加载文件，获取文件的内容
-      code = await readFile(fileUrl, 'utf-8');
-    } catch (e) {
-      return {
-        code: 'error'
-      };
+      code = await readFile(fileUrl, 'utf-8')
     }
-  } else {
+    catch (e) {
+      return {
+        code: 'error',
+      }
+    }
+  }
+  else {
     // 如果用户做出了操作，那么就用用户操作后的内容
-    code = loadResult;
+    code = loadResult
   }
 
   if (code == null) {
     return {
-      code: 'error'
-    };
+      code: 'error',
+    }
   }
 
-  const transformResult = await pluginContainer!.transform(code, fileUrl);
+  const transformResult = await pluginContainer!.transform(code, fileUrl)
 
-  code = transformResult ? transformResult : code;
+  code = transformResult || code
 
   return {
-    code
-  };
+    code,
+  }
 }

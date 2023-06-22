@@ -1,26 +1,23 @@
 module.exports = {
+  root: true,
   env: {
     browser: true,
     node: true,
-    es2021: true,
   },
-  extends: ['eslint:recommended', 'plugin:vue/essential', 'plugin:@typescript-eslint/recommended'],
-  parserOptions: {
-    ecmaVersion: 'latest',
-    parser: '@typescript-eslint/parser',
-    sourceType: 'module',
-  },
-  globals: {
-    ReactDOM: 'readonly',
-  },
-  plugins: ['vue', '@typescript-eslint'],
+  extends: ['@antfu'],
   rules: {
-    indent: ['error', 2],
-    'linebreak-style': ['error', 'unix'],
-    quotes: ['error', 'single'],
-    semi: ['error', 'always'],
-    '@typescript-eslint/no-non-null-assertion': ['off'],
-    '@typescript-eslint/ban-ts-comment': ['off'],
-    'object-curly-spacing': ['error', 'always'],
+    '@typescript-eslint/no-unsafe-assignment': 'off',
+    '@typescript-eslint/require-await': 'off',
+    '@typescript-eslint/no-floating-promises': 'off',
+    '@typescript-eslint/no-unsafe-return': 'off',
+    '@typescript-eslint/no-unsafe-member-access': 'off',
+    '@typescript-eslint/no-use-before-define': 'off',
+    'n/prefer-global/buffer': 'off',
+    'no-console': 'off',
+    '@typescript-eslint/no-misused-promises': 'off',
+    '@typescript-eslint/no-unsafe-call': 'off',
+    '@typescript-eslint/ban-ts-comment': 'off',
+    'prefer-regex-literals': 'off',
+    '@typescript-eslint/no-unsafe-argument': 'off',
   },
-};
+}
