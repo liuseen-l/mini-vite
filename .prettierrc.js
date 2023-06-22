@@ -36,4 +36,4 @@ module.exports = {
   vueIndentScriptAndStyle: false,
   // 换行符使用 lf
   endOfLine: 'lf',
-};
+}

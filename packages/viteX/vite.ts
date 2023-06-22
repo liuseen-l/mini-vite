@@ -1,2 +1,3 @@
-import { createServer } from './src/node/server';
-createServer();
+import { createServer } from './src/node/server'
+
+createServer()

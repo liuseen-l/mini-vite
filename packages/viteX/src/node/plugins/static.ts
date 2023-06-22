@@ -1,9 +1,10 @@
-import { Plugin } from '../server';
-import { staticMiddleware } from '../server/middlewares/static';
+import type { Plugin } from '../server'
+import { staticMiddleware } from '../server/middlewares/static'
+
 export function staticPlugin(): Plugin {
   return {
     configureServer(server) {
-      server.app.use(staticMiddleware());
+      server.app.use(staticMiddleware())
     },
-  };
+  }
 }
