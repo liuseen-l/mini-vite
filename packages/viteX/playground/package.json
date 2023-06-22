@@ -6,7 +6,7 @@
   "license": "ISC",
   "keywords": [],
   "scripts": {
-    "dev": "esno ../vite.ts"
+    "dev": "esno ../cli.ts"
   },
   "dependencies": {
     "@types/react": "^18.0.14",
