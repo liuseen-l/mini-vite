@@ -20,8 +20,6 @@
   "devDependencies": {
     "@antfu/eslint-config": "^0.39.5",
     "@babel/core": "^7.22.5",
-    "@commitlint/cli": "^16.3.0",
-    "@commitlint/config-conventional": "^16.2.4",
     "@types/node": "^20.3.1",
     "@types/prompts": "^2.4.4",
     "@types/semver": "^7.5.0",
