@@ -1,10 +1,10 @@
 import { dirname } from 'node:path'
-import postcss from 'postcss'
 import atImport from 'postcss-import'
+import postcss from 'postcss'
 import less from 'less'
 import type { Plugin } from '../server'
 import { isCSSRequest } from '../utils'
-import { isLessRequest } from '../../../playground/plugins/less'
+import { isLessRequest } from '../../../../../playground/plugins/less'
 
 export function cssPlugin(): Plugin {
   return {

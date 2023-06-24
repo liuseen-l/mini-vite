@@ -1,7 +1,7 @@
 import http from 'node:http'
 import path from 'node:path'
 import connect from 'connect'
-import { loadInternalPlugins } from '../plugins'
+import { resolvePlugins } from '../plugins'
 import type { ResolvedConfig } from '../config'
 import { resolveConfig } from '../config'
 import { transformMiddleware } from './middlewares/transform'
@@ -33,10 +33,17 @@ export interface ViteDevServer {
   root: string
 }
 
-export async function createServer() {
+export function createServer(): Promise<void> {
+  return _createServer()
+}
+
+export async function _createServer() {
   const config = await resolveConfig()
 
-  const plugins = [...(config.plugins || []), ...loadInternalPlugins()]
+  if (!config)
+    return
+
+  const plugins = [...(config.plugins || []), ...resolvePlugins()]
   const app = connect()
 
   // server 作为上下文对象，用于保存一些状态和对象，将会在 Server 的各个流程中被使用

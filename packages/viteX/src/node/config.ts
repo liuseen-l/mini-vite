@@ -17,8 +17,15 @@ export type ResolvedConfig = Readonly<{
   plugins?: Plugin[]
 }>
 
-export async function resolveConfig(): Promise<ResolvedConfig> {
+export async function resolveConfig(): Promise<ResolvedConfig | undefined> {
   const configFilePath = pathToFileURL(resolve(process.cwd(), './vite.config.js'))
-  const config = await import(configFilePath.href)
-  return config.default.default
+
+  try {
+    const config = await import(configFilePath.href)
+
+    return config.default
+  }
+  catch (error) {
+    console.log('gg')
+  }
 }

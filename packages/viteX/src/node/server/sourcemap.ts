@@ -4,6 +4,5 @@ export function genSourceMapUrl(map: string): string {
 
 export function getCodeWithSourcemap(code: string, map: string): string {
   code += `\n//# sourceMappingURL=${genSourceMapUrl(map)}`
-
   return code
 }

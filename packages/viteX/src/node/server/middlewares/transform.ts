@@ -11,10 +11,9 @@ export function transformMiddleware(server: ViteDevServer): NextHandleFunction {
     const url: string = req.url!
 
     if (isJSRequest(url) || isCSSRequest(url)) {
-      // 解析模块路径
+      // resolve the module path
       const file = url.startsWith('/') ? `.${url}` : url
 
-      // 遍历所有的插件
       const result = await transformRequest(file, server)
 
       res.setHeader('Content-Type', 'application/javascript')

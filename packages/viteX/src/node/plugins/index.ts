@@ -6,6 +6,6 @@ import { cssPlugin, cssPostPlugin } from './css'
 import { staticPlugin } from './static'
 import { esbuildPlugin } from './esbuild'
 
-export function loadInternalPlugins(): Plugin[] {
+export function resolvePlugins(): Plugin[] {
   return [esbuildPlugin(), cssPlugin(), cssPostPlugin(), staticPlugin()]
 }

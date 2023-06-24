@@ -1,23 +1,29 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "outDir": "temp",
+    "sourceMap": false,
     "target": "esnext",
+    "newLine": "LF",
+    "useDefineForClassFields": false,
     "module": "esnext",
     "moduleResolution": "node",
-    "experimentalDecorators": true,
+    "allowJs": false,
     "strict": true,
-    "jsx": "preserve",
-    "sourceMap": true,
+    "noUnusedLocals": true,
+    "experimentalDecorators": true,
     "resolveJsonModule": true,
-    "esModuleInterop": true,
-    "declaration": true,
+    "isolatedModules": true,
     "skipLibCheck": true,
+    "esModuleInterop": true,
+    "removeComments": false,
+    "jsx": "preserve",
+    "rootDir": ".",
     "lib": [
       "esnext",
       "dom",
       "dom.iterable"
     ],
-    "baseUrl": "./",
-    "noUnusedLocals": true,
     "noUnusedParameters": true
   }
 }
