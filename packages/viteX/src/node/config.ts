@@ -22,10 +22,9 @@ export async function resolveConfig(): Promise<ResolvedConfig | undefined> {
 
   try {
     const config = await import(configFilePath.href)
-
     return config.default
   }
   catch (error) {
-    console.log('gg')
+    console.log('resolve config error')
   }
 }
