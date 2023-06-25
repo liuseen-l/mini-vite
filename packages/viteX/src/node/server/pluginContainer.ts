@@ -75,5 +75,6 @@ export function createPluginContainer(server: ViteDevServer): PluginContainer {
       return code
     },
   }
+
   return container
 }
