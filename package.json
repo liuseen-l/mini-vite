@@ -1,4 +1,5 @@
-{
+{ 
+  "name": "mini-vite",
   "private": true,
   "description": "<p style=\"display:flex; justify-content: center\">",
   "author": "",
