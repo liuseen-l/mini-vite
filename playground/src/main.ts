@@ -4,6 +4,7 @@ import './style/style.css'
 import './style/less-test.less'
 
 const app = document.getElementById('app')
+
 app!.innerText = 'Hello World'
 
 subModule(app!)
