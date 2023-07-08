@@ -1,4 +1,4 @@
-{ 
+{
   "name": "mini-vite",
   "private": true,
   "description": "<p style=\"display:flex; justify-content: center\">",
@@ -11,6 +11,7 @@
   "keywords": [],
   "main": ".prettierrc.js",
   "scripts": {
+    "build": "tsup --watch",
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky install"
   },
@@ -25,8 +26,10 @@
     "@types/semver": "^7.5.0",
     "@typescript-eslint/eslint-plugin": "^5.60.0",
     "@typescript-eslint/parser": "^5.60.0",
+    "chokidar": "^3.5.3",
     "connect": "^3.7.0",
     "conventional-changelog-cli": "^2.2.2",
+    "esbuild": "^0.14.47",
     "eslint": "^8.43.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^8.7.1",
@@ -47,6 +50,7 @@
     "stylelint": "^14.16.1",
     "stylelint-config-prettier": "^9.0.5",
     "stylelint-less": "^1.0.6",
+    "tsup": "^6.1.2",
     "tsx": "^3.12.7",
     "typescript": "^5.1.3"
   },
