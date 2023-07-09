@@ -7,8 +7,7 @@
   "license": "ISC",
   "keywords": [],
   "scripts": {
-    "dev": "esno ./scripts/run.ts",
-    "start": "vitex"
+    "dev": "vitex"
   },
   "dependencies": {
     "@types/react": "^18.0.14",
