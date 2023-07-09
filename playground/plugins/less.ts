@@ -1,5 +1,5 @@
 import { dirname } from 'node:path'
-import type { Plugin } from 'viteX'
+import type { Plugin } from 'vitex'
 import type { NextHandleFunction } from 'connect'
 import { readFile } from 'fs-extra'
 import postcss from 'postcss'
