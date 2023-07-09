@@ -24,5 +24,6 @@ module.exports = {
     'no-unreachable-loop': 'off',
     'no-new-func': 'off',
     'import/no-mutable-exports': 'off',
+    'no-cond-assign': 'off',
   },
 }

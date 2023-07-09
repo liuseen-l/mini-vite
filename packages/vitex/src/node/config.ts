@@ -99,7 +99,7 @@ export async function loadConfigFromFile(
 
   try {
     const bundled = await bundleConfigFile(resolvedPath, isESM)
-    // console.log(bundled.code);
+    console.log(bundled.code)
 
     const userConfig = await loadConfigFromBundledFile(
       resolvedPath,

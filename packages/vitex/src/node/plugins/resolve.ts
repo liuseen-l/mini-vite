@@ -1,7 +1,7 @@
 import path from 'node:path'
 import fs from 'node:fs'
 import { exports, imports } from 'resolve.exports'
-import { cleanUrl, deepImportRE, isInNodeModules } from '../utils'
+import { cleanUrl, deepImportRE, isInNodeModules, isObject, normalizePath, safeRealpathSync, tryStatSync } from '../utils'
 import type { PackageData } from '../packages'
 import { resolvePackageData } from '../packages'
 
@@ -48,6 +48,7 @@ export function tryNodeResolve(
 
   let resolved: string | undefined
   try {
+    console.log(123, unresolvedId)
     resolved = resolveId(unresolvedId, pkg, targetWeb, options)
   }
   catch (err) {
@@ -100,7 +101,6 @@ export function resolvePackageEntry(
 ): string | undefined {
   try {
     let entryPoint: string | undefined
-    console.log(id)
 
     if (data.exports) {
       entryPoint = resolveExportsOrImports(
@@ -112,18 +112,162 @@ export function resolvePackageEntry(
       )
     }
 
+    const resolvedFromExports = !!entryPoint
+
+    if (!resolvedFromExports && (!entryPoint || entryPoint.endsWith('.mjs'))) {
+      for (const field of options.mainFields) {
+        if (field === 'browser')
+          continue // already checked above
+        if (typeof data[field] === 'string') {
+          entryPoint = data[field]
+          break
+        }
+      }
+    }
     entryPoint ||= data.main
 
     const entryPoints = entryPoint
       ? [entryPoint]
       : ['index.js', 'index.json', 'index.node']
 
-    for (const entry of entryPoints) {
+    for (let entry of entryPoints) {
+      // make sure we don't get scripts when looking for sass
+      let skipPackageJson = false
+      if (
+        options.mainFields[0] === 'sass'
+        && !options.extensions.includes(path.extname(entry))
+      ) {
+        entry = ''
+        skipPackageJson = true
+      }
+      else {
+        // resolve object browser field in package.json
+        const { browser: browserField } = data
+        if (targetWeb && options.browserField && isObject(browserField))
+          entry = mapWithBrowserField(entry, browserField) || entry
+      }
+
       const entryPointPath = path.join(dir, entry)
-      return entryPointPath
+      const resolvedEntryPoint = tryFsResolve(
+        entryPointPath,
+        options,
+        true,
+        true,
+        skipPackageJson,
+      )
+      if (resolvedEntryPoint)
+        return resolvedEntryPoint
     }
   }
   catch (e) {
     console.log(id, 'g')
   }
+}
+
+function mapWithBrowserField(
+  relativePathInPkgDir: string,
+  map: Record<string, string | false>,
+): string | false | undefined {
+  const normalizedPath = path.posix.normalize(relativePathInPkgDir)
+
+  for (const key in map) {
+    const normalizedKey = path.posix.normalize(key)
+    if (
+      normalizedPath === normalizedKey
+      || equalWithoutSuffix(normalizedPath, normalizedKey, '.js')
+      || equalWithoutSuffix(normalizedPath, normalizedKey, '/index.js')
+    )
+      return map[key]
+  }
+}
+
+function equalWithoutSuffix(path: string, key: string, suffix: string) {
+  return key.endsWith(suffix) && key.slice(0, -suffix.length) === path
+}
+
+export function tryFsResolve(
+  fsPath: string,
+  options: any,
+  tryIndex = true,
+  targetWeb = true,
+  skipPackageJson = false,
+): string | undefined {
+  const { file, postfix } = splitFileAndPostfix(fsPath)
+  const res = tryCleanFsResolve(
+    file,
+    options,
+    tryIndex,
+    targetWeb,
+    skipPackageJson,
+  )
+  if (res)
+    return res + postfix
+}
+
+function splitFileAndPostfix(path: string) {
+  const file = cleanUrl(path)
+  return { file, postfix: path.slice(file.length) }
+}
+
+function tryResolveRealFile(
+  file: string,
+  preserveSymlinks: boolean,
+): string | undefined {
+  const stat = tryStatSync(file)
+  if (stat?.isFile())
+    return getRealPath(file, preserveSymlinks)
+}
+
+function tryResolveRealFileWithExtensions(
+  filePath: string,
+  extensions: string[],
+  preserveSymlinks: boolean,
+): string | undefined {
+  for (const ext of extensions) {
+    const res = tryResolveRealFile(filePath + ext, preserveSymlinks)
+    if (res)
+      return res
+  }
+}
+
+const knownTsOutputRE = /\.(?:js|mjs|cjs|jsx)$/
+const isPossibleTsOutput = (url: string): boolean => knownTsOutputRE.test(url)
+function tryCleanFsResolve(
+  file: string,
+  options: any,
+): string | undefined {
+  const { tryPrefix, extensions, preserveSymlinks } = options
+
+  const fileStat = tryStatSync(file)
+
+  // Try direct match first
+  if (fileStat?.isFile())
+    return getRealPath(file, options.preserveSymlinks)
+
+  let res: string | undefined
+
+  // If path.dirname is a valid directory, try extensions and ts resolution logic
+  const possibleJsToTs = options.isFromTsImporter && isPossibleTsOutput(file)
+  if (possibleJsToTs || extensions.length || tryPrefix) {
+    const dirPath = path.dirname(file)
+    const dirStat = tryStatSync(dirPath)
+    if (dirStat?.isDirectory()) {
+      if (
+        (res = tryResolveRealFileWithExtensions(
+          file,
+          extensions,
+          preserveSymlinks,
+        ))
+      )
+        return res
+    }
+  }
+}
+
+export const browserExternalId = '__vite-browser-external'
+function getRealPath(resolved: string, preserveSymlinks?: boolean): string {
+  if (!preserveSymlinks && browserExternalId !== resolved)
+    resolved = safeRealpathSync(resolved)
+
+  return normalizePath(resolved)
 }

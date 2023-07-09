@@ -1,16 +1,20 @@
 import { dirname } from 'node:path'
-import type { Plugin } from 'vitex'
+import fs from 'node:fs'
+import type { Plugin } from 'vite'
 import type { NextHandleFunction } from 'connect'
-import { readFile } from 'fs-extra'
 import postcss from 'postcss'
 import atImport from 'postcss-import'
 import less from 'less'
-import { cleanUrl } from 'viteX/src/node/utils'
+
+export const queryRE = /\?.*$/s
+export const hashRE = /#.*$/s
+export const cleanUrl = (url: string): string => url.replace(hashRE, '').replace(queryRE, '')
 
 export function lessPlugin(): Plugin {
   return {
-    configureServer(server: { app: { use: (arg0: NextHandleFunction) => void } }) {
-      server.app.use(lessMiddleware())
+    name: 'da',
+    configureServer(server) {
+      server.middlewares.use(lessMiddleware())
     },
   }
 }
@@ -27,7 +31,7 @@ function lessMiddleware(): NextHandleFunction {
 
     if (isLessRequest(url)) {
       const filePath = url.startsWith('/') ? `.${url}` : url
-      const rawCode = await readFile(filePath, 'utf-8')
+      const rawCode = await fs.readFileSync(filePath, 'utf-8')
 
       // 预处理器处理 less
       const lessResult = await less.render(rawCode, {
