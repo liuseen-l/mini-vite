@@ -1,17 +1,30 @@
 {
-  "name": "viteX",
-  "version": "0.1.6",
+  "name": "vitex",
+  "version": "0.0.1",
   "description": "<p style=\"display:flex; justify-content: center\">",
   "author": "",
   "license": "ISC",
   "keywords": [],
   "main": "index.ts",
+  "type": "module",
   "module": "index.ts",
+  "bin": {
+    "vitex": "bin/vitex.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
   "files": [
     "dist",
     "types"
   ],
-  "scripts": {},
+  "scripts": {
+    "build": "rimraf dist && run-s build-bundle",
+    "build-bundle": "rollup --config rollup.config.ts --watch --configPlugin typescript"
+  },
   "dependencies": {
     "@types/node": "^18.0.0",
     "@types/postcss-import": "^14.0.0",
@@ -24,11 +37,16 @@
     "sirv": "^2.0.2"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.2",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.1.0",
+    "@rollup/plugin-typescript": "^11.1.2",
     "@types/connect": "^3.4.35",
     "cac": "^6.7.14",
     "conventional-changelog": "^3.1.25",
     "esbuild": "^0.14.47",
-    "rollup": "^2.75.7",
+    "magic-string": "^0.30.1",
+    "rollup": "^3.25.2",
     "tsup": "^6.1.2",
     "typescript": "^4.4.3"
   },

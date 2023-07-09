@@ -19,5 +19,10 @@ module.exports = {
     '@typescript-eslint/ban-ts-comment': 'off',
     'prefer-regex-literals': 'off',
     '@typescript-eslint/no-unsafe-argument': 'off',
+    'no-useless-catch': 'off',
+    'unused-imports/no-unused-vars': 'off',
+    'no-unreachable-loop': 'off',
+    'no-new-func': 'off',
+    'import/no-mutable-exports': 'off',
   },
 }

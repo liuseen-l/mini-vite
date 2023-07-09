@@ -1,12 +1,14 @@
-import http from 'node:http'
-import path from 'node:path'
-import connect from 'connect'
-import { resolvePlugins } from '../plugins'
+// import path from 'node:path'
+import type connect from 'connect'
+
+// import { resolvePlugins } from '../plugins'
 import type { ResolvedConfig } from '../config'
 import { resolveConfig } from '../config'
-import { transformMiddleware } from './middlewares/transform'
+
+// import { transformMiddleware } from './middlewares/transform'
 import type { PluginContainer } from './pluginContainer'
-import { createPluginContainer } from './pluginContainer'
+
+// import { createPluginContainer } from './pluginContainer'
 
 export type ServerHook = (server: ViteDevServer) => (() => void) | void | Promise<(() => void) | void>
 
@@ -38,34 +40,38 @@ export function createServer(): Promise<void> {
 }
 
 export async function _createServer() {
-  const config = await resolveConfig()
+  console.log(3)
 
-  if (!config)
-    return
+  const config = await resolveConfig('serve')
 
-  const plugins = [...(config.plugins || []), ...resolvePlugins()]
-  const app = connect()
+  // if (!config)
+  //   return
 
-  // server 作为上下文对象，用于保存一些状态和对象，将会在 Server 的各个流程中被使用
-  let server: ViteDevServer = {
-    plugins,
-    app,
-    config,
-    root: path.resolve(__dirname, '../../../playground'),
-  }
+  // const plugins = [...(config.plugins || []), ...resolvePlugins()]
+  // const app = connect()
 
-  const container = createPluginContainer(server)
+  // // server 作为上下文对象，用于保存一些状态和对象，将会在 Server 的各个流程中被使用
+  // let server: ViteDevServer = {
+  //   plugins,
+  //   app,
+  //   config,
+  //   root: path.resolve(__dirname, '../../../playground'),
+  // }
 
-  server = {
-    ...server,
-    pluginContainer: container,
-  }
+  // const container = createPluginContainer(server)
 
-  app.use(transformMiddleware(server))
+  // server = {
+  //   ...server,
+  //   pluginContainer: container,
+  // }
 
-  for (const plugin of plugins) plugin?.configureServer?.(server)
+  // app.use(transformMiddleware(server))
 
-  http.createServer(app).listen(3000)
+  // for (const plugin of plugins) plugin?.configureServer?.(server)
 
-  console.log('open http://localhost:3000/')
+  // app.listen(3000, () => {
+  //   console.log('服务启动')
+  // })
+
+  // console.log('open http://localhost:3000/')
 }
