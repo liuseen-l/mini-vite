@@ -1,21 +1,21 @@
 {
   "name": "vitex",
+  "type": "module",
   "version": "0.0.1",
   "description": "<p style=\"display:flex; justify-content: center\">",
   "author": "",
   "license": "ISC",
   "keywords": [],
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    }
+  },
   "main": "index.ts",
-  "type": "module",
   "module": "index.ts",
   "bin": {
     "vitex": "bin/vitex.js"
-  },
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
-    }
   },
   "files": [
     "dist",
