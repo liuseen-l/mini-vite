@@ -23,7 +23,9 @@
   ],
   "scripts": {
     "build": "rimraf dist && run-s build-bundle",
-    "build-bundle": "rollup --config rollup.config.ts --watch --configPlugin typescript"
+    "build:dev": "rimraf dist && run-s build-bundle-watch",
+    "build-bundle-watch": "rollup --config rollup.config.ts --configPlugin typescript --watch",
+    "build-bundle": "rollup --config rollup.config.ts --configPlugin typescript"
   },
   "dependencies": {
     "@types/node": "^18.0.0",
