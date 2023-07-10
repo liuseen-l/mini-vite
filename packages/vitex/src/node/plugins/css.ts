@@ -2,12 +2,13 @@ import { dirname } from 'node:path'
 import atImport from 'postcss-import'
 import postcss from 'postcss'
 import less from 'less'
-import type { Plugin } from '../server'
+import type { Plugin } from 'vite'
 import { isCSSRequest } from '../utils'
 import { isLessRequest } from '../../../../../playground/plugins/less'
 
 export function cssPlugin(): Plugin {
   return {
+    name: 'vite-css',
     async transform(code, url) {
       if (isCSSRequest(url)) {
         const file = url.startsWith('/') ? `.${url}` : url
@@ -34,6 +35,7 @@ export function cssPlugin(): Plugin {
 
 export function cssPostPlugin(): Plugin {
   return {
+    name: 'da',
     async transform(code, url) {
       if (isCSSRequest(url)) {
         return `

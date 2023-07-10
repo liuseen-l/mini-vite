@@ -13,8 +13,6 @@
   "main": ".prettierrc.js",
   "scripts": {
     "lint": "eslint .",
-    "build": "pnpm --filter vitex run build",
-    "build:dev": "pnpm --filter vitex run build:dev",
     "preinstall": "npx only-allow pnpm",
     "prepare": "husky install"
   },

@@ -1,12 +1,12 @@
 // import path from 'node:path'
-import type connect from 'connect'
 
 // import { resolvePlugins } from '../plugins'
-import type { ResolvedConfig } from '../config'
-import { resolveConfig } from '../config'
+import type { InlineConfig, ViteDevServer } from 'vite'
+import { resolveConfig } from 'vite'
+
+// import { resolveConfig } from '../config'
 
 // import { transformMiddleware } from './middlewares/transform'
-import type { PluginContainer } from './pluginContainer'
 
 // import { createPluginContainer } from './pluginContainer'
 
@@ -27,22 +27,15 @@ export interface Plugin {
   load?: Load
 }
 
-export interface ViteDevServer {
-  plugins: Plugin[]
-  app: connect.Server
-  config: ResolvedConfig
-  pluginContainer?: PluginContainer
-  root: string
+export function createServer(inlineConfig: InlineConfig = {}): Promise<void> {
+  return _createServer(inlineConfig, { ws: true })
 }
 
-export function createServer(): Promise<void> {
-  return _createServer()
-}
-
-export async function _createServer() {
-  console.log(3)
-
-  const config = await resolveConfig('serve')
+export async function _createServer(
+  inlineConfig: InlineConfig = {},
+  options: { ws: boolean },
+) {
+  const config = await resolveConfig(inlineConfig, 'serve')
 
   // if (!config)
   //   return

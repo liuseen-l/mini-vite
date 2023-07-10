@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import { execa } from 'execa'
 
 const dir = path.dirname(fileURLToPath(import.meta.url))
-const rootDir = path.resolve(dir, '../dist/cli.js');
+const rootDir = path.resolve(dir, '../src/node/cli.ts');
 
 (async () => {
   await execa(`esno ${rootDir}`, {

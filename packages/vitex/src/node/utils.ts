@@ -4,6 +4,7 @@ import os from 'node:os'
 import { builtinModules, createRequire } from 'node:module'
 import { exec } from 'node:child_process'
 import { createFilter as _createFilter } from '@rollup/pluginutils'
+import type { Alias, AliasOptions } from 'vite'
 
 const knownJsSrcRE = /\.((j|t)sx?)$/
 export function isJSRequest(url: string): boolean {
@@ -169,4 +170,133 @@ export const createFilter = _createFilter as (
 
 export function isInNodeModules(id: string): boolean {
   return id.includes('node_modules')
+}
+
+export async function asyncFlatten<T>(arr: T[]): Promise<T[]> {
+  do
+    arr = (await Promise.all(arr)).flat(Infinity) as any
+  while (arr.some((v: any) => v?.then))
+  return arr
+}
+
+function normalizeSingleAlias({
+  find,
+  replacement,
+  customResolver,
+}: Alias): Alias {
+  if (
+    typeof find === 'string'
+    && find[find.length - 1] === '/'
+    && replacement[replacement.length - 1] === '/'
+  ) {
+    find = find.slice(0, find.length - 1)
+    replacement = replacement.slice(0, replacement.length - 1)
+  }
+
+  const alias: Alias = {
+    find,
+    replacement,
+  }
+  if (customResolver)
+    alias.customResolver = customResolver
+
+  return alias
+}
+
+export function normalizeAlias(o: AliasOptions = []): Alias[] {
+  return Array.isArray(o)
+    ? o.map(normalizeSingleAlias)
+    : Object.keys(o).map(find =>
+      normalizeSingleAlias({
+        find,
+        replacement: (o as any)[find],
+      }),
+    )
+}
+
+export function mergeAlias(
+  a?: AliasOptions,
+  b?: AliasOptions,
+): AliasOptions | undefined {
+  if (!a)
+    return b
+  if (!b)
+    return a
+  if (isObject(a) && isObject(b))
+    return { ...a, ...b }
+
+  // the order is flipped because the alias is resolved from top-down,
+  // where the later should have higher priority
+  return [...normalizeAlias(b), ...normalizeAlias(a)]
+}
+
+export function arraify<T>(target: T | T[]): T[] {
+  return Array.isArray(target) ? target : [target]
+}
+
+function mergeConfigRecursively(
+  defaults: Record<string, any>,
+  overrides: Record<string, any>,
+  rootPath: string,
+) {
+  const merged: Record<string, any> = { ...defaults }
+  for (const key in overrides) {
+    const value = overrides[key]
+    if (value == null)
+      continue
+
+    const existing = merged[key]
+
+    if (existing == null) {
+      merged[key] = value
+      continue
+    }
+
+    if (key === 'alias' && (rootPath === 'resolve' || rootPath === '')) {
+      merged[key] = mergeAlias(existing, value)
+      continue
+    }
+    else if (key === 'assetsInclude' && rootPath === '') {
+      merged[key] = [].concat(existing, value)
+      continue
+    }
+    else if (
+      key === 'noExternal'
+      && rootPath === 'ssr'
+      && (existing === true || value === true)
+    ) {
+      merged[key] = true
+      continue
+    }
+
+    if (Array.isArray(existing) || Array.isArray(value)) {
+      merged[key] = [...arraify(existing ?? []), ...arraify(value ?? [])]
+      continue
+    }
+    if (isObject(existing) && isObject(value)) {
+      merged[key] = mergeConfigRecursively(
+        existing,
+        value,
+        rootPath ? `${rootPath}.${key}` : key,
+      )
+      continue
+    }
+
+    merged[key] = value
+  }
+  return merged
+}
+
+export function mergeConfig<
+  D extends Record<string, any>,
+  O extends Record<string, any>,
+>(
+  defaults: D extends Function ? never : D,
+  overrides: O extends Function ? never : O,
+  isRoot = true,
+): Record<string, any> {
+  if (typeof defaults === 'function' || typeof overrides === 'function')
+    throw new Error('Cannot merge config in form of callback')
+
+  return mergeConfigRecursively(defaults, overrides, isRoot ? '' : '.')
 }

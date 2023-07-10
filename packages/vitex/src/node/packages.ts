@@ -59,11 +59,6 @@ export function loadPackageData(pkgPath: string): PackageData {
   }
   else if (Array.isArray(sideEffects)) {
     const finalPackageSideEffects = sideEffects.map((sideEffect) => {
-      /*
-       * The array accepts simple glob patterns to the relevant files... Patterns like *.css, which do not include a /, will be treated like **\/*.css.
-       * https://webpack.js.org/guides/tree-shaking/
-       * https://github.com/vitejs/vite/pull/11807
-       */
       if (sideEffect.includes('/'))
         return sideEffect
 

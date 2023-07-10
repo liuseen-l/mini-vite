@@ -1,6 +1,6 @@
 import type { NextHandleFunction } from 'connect'
+import type { ViteDevServer } from 'vite'
 import { isCSSRequest, isJSRequest } from '../../utils'
-import type { ViteDevServer } from '../index'
 import { transformRequest } from '../transformRequest'
 
 export function transformMiddleware(server: ViteDevServer): NextHandleFunction {

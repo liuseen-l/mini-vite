@@ -5,50 +5,151 @@ import { pathToFileURL } from 'node:url'
 import { createRequire } from 'node:module'
 import { promisify } from 'node:util'
 import { build } from 'esbuild'
-import { dynamicImport, isBuiltin, isObject, lookupFile, normalizePath } from './utils'
+import { type ConfigEnv, type InlineConfig, type Plugin, type ResolvedConfig, type UserConfig, type UserConfigExport } from 'vite'
+import { asyncFlatten, dynamicImport, isBuiltin, isObject, lookupFile, mergeConfig, normalizePath } from './utils'
 import { DEFAULT_CONFIG_FILES, DEFAULT_EXTENSIONS } from './constants'
-import type { Plugin } from './server'
 import { tryNodeResolve } from './plugins/resolve'
-
-export interface UserConfig {
-  root?: string
-  plugins?: Plugin[]
-}
-
-export interface ConfigEnv {
-  command: 'build' | 'serve'
-  mode: string
-  ssrBuild?: boolean
-}
-export type UserConfigFn = (env: ConfigEnv) => UserConfig | Promise<UserConfig>
-export type UserConfigExport = UserConfig | Promise<UserConfig> | UserConfigFn
+import { getSortedPluginsByHook } from './plugins'
 
 export function defineConfig(config: UserConfigExport) {
   return config
 }
 
-export type ResolvedConfig = Readonly<{
-  plugins?: Plugin[]
-}>
+export function sortUserPlugins(
+  plugins: (Plugin | Plugin[])[] | undefined,
+): [Plugin[], Plugin[], Plugin[]] {
+  const prePlugins: Plugin[] = []
+  const postPlugins: Plugin[] = []
+  const normalPlugins: Plugin[] = []
+
+  if (plugins) {
+    plugins.flat().forEach((p) => {
+      if (p.enforce === 'pre')
+        prePlugins.push(p)
+      else if (p.enforce === 'post')
+        postPlugins.push(p)
+      else normalPlugins.push(p)
+    })
+  }
+
+  return [prePlugins, normalPlugins, postPlugins]
+}
+
+async function runConfigHook(
+  config: InlineConfig,
+  plugins: Plugin[],
+  configEnv: ConfigEnv,
+): Promise<InlineConfig> {
+  let conf = config
+
+  for (const p of getSortedPluginsByHook('config', plugins)) {
+    const hook = p.config
+    const handler = hook && 'handler' in hook ? hook.handler : hook
+    if (handler) {
+      const res = await handler(conf, configEnv)
+      if (res)
+        conf = mergeConfig(conf, res)
+    }
+  }
+
+  return conf
+}
 
 export async function resolveConfig(
+  inlineConfig: InlineConfig,
   command: 'build' | 'serve',
   defaultMode = 'development',
 ): Promise<ResolvedConfig | undefined> {
+  let config = inlineConfig
   const mode = defaultMode
+
+  let configFileDependencies: string[] = []
 
   const configEnv = {
     mode,
     command,
   }
-  try {
-    const config = await loadConfigFromFile(configEnv)
 
-    return undefined
+  let { configFile } = config
+
+  if (configFile !== false) {
+    const loadResult = await loadConfigFromFile(
+      configEnv,
+      configFile,
+      config.root,
+    )
+    if (loadResult) {
+      config = mergeConfig(loadResult.config, config)
+      configFile = loadResult.path
+      configFileDependencies = loadResult.dependencies
+    }
   }
-  catch (error) {
-    console.log('resolve config error')
+
+  const filterPlugin = (p: Plugin) => {
+    if (!p)
+      return false
+
+    else if (!p.apply)
+      return true
+
+    else if (typeof p.apply === 'function')
+      return p.apply({ ...config, mode }, configEnv)
+
+    else
+      return p.apply === command
   }
+
+  // resolve plugins
+  const rawUserPlugins = (
+    (await asyncFlatten(config.plugins || [])) as Plugin[]
+  ).filter(filterPlugin)
+
+  const [prePlugins, normalPlugins, postPlugins]
+    = sortUserPlugins(rawUserPlugins)
+
+  // run config hooks
+  const userPlugins = [...prePlugins, ...normalPlugins, ...postPlugins]
+  config = await runConfigHook(config, userPlugins, configEnv)
+
+  // resolve root
+  const resolvedRoot = normalizePath(
+    config.root ? path.resolve(config.root) : process.cwd(),
+  )
+
+  const { publicDir } = config
+  const resolvedPublicDir
+    = publicDir !== false && publicDir !== ''
+      ? path.resolve(
+        resolvedRoot,
+        typeof publicDir === 'string' ? publicDir : 'public',
+      )
+      : ''
+
+  const resolvedConfig: any = {
+    configFile: configFile ? normalizePath(configFile) : undefined,
+    configFileDependencies: configFileDependencies.map(name =>
+      normalizePath(path.resolve(name)),
+    ),
+    inlineConfig,
+    root: resolvedRoot,
+    publicDir: resolvedPublicDir,
+    command,
+    mode,
+    mainConfig: null,
+    plugins: userPlugins,
+    // build: resolvedBuildOptions,
+    optimizeDeps: {
+      disabled: 'build',
+      esbuildOptions: {
+      },
+    },
+  }
+  const resolved: ResolvedConfig = {
+    ...config,
+    ...resolvedConfig,
+  }
+
+  return resolved
 }
 
 export async function loadConfigFromFile(
@@ -99,7 +200,6 @@ export async function loadConfigFromFile(
 
   try {
     const bundled = await bundleConfigFile(resolvedPath, isESM)
-    console.log(bundled.code)
 
     const userConfig = await loadConfigFromBundledFile(
       resolvedPath,
@@ -294,6 +394,7 @@ const promisifiedRealpath = promisify(fs.realpath)
 interface NodeModuleWithCompile extends NodeModule {
   _compile(code: string, filename: string): any
 }
+
 async function loadConfigFromBundledFile(
   fileName: string,
   bundledCode: string,

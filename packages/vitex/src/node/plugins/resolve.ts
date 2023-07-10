@@ -114,6 +114,7 @@ export function resolvePackageEntry(
 
     const resolvedFromExports = !!entryPoint
 
+    // 如果这个包没有exports字段
     if (!resolvedFromExports && (!entryPoint || entryPoint.endsWith('.mjs'))) {
       for (const field of options.mainFields) {
         if (field === 'browser')
@@ -151,9 +152,6 @@ export function resolvePackageEntry(
       const resolvedEntryPoint = tryFsResolve(
         entryPointPath,
         options,
-        true,
-        true,
-        skipPackageJson,
       )
       if (resolvedEntryPoint)
         return resolvedEntryPoint
@@ -188,17 +186,11 @@ function equalWithoutSuffix(path: string, key: string, suffix: string) {
 export function tryFsResolve(
   fsPath: string,
   options: any,
-  tryIndex = true,
-  targetWeb = true,
-  skipPackageJson = false,
 ): string | undefined {
   const { file, postfix } = splitFileAndPostfix(fsPath)
   const res = tryCleanFsResolve(
     file,
     options,
-    tryIndex,
-    targetWeb,
-    skipPackageJson,
   )
   if (res)
     return res + postfix

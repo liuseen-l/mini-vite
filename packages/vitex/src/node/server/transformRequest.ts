@@ -1,5 +1,5 @@
 import { readFile } from 'fs-extra'
-import type { ViteDevServer } from '.'
+import type { ViteDevServer } from 'vite'
 
 export function transformRequest(url: string, server: ViteDevServer) {
   const request = doTransform(url, server)
@@ -12,7 +12,7 @@ async function doTransform(url: string, server: ViteDevServer) {
 
   // 原则上需要通过判断当前的模块是不是第三方模块才执行resolveId,但在这里我们都执行了
   const resolved = (await pluginContainer!.resolveId(url, undefined)) ?? undefined
-  const result = loadAndTransform(url, server, resolved)
+  const result = loadAndTransform(url, server, (resolved as any))
   return result
 }
 
@@ -39,7 +39,7 @@ async function loadAndTransform(url: string, server: ViteDevServer, resolved?: s
   }
   else {
     // 如果用户做出了操作，那么就用用户操作后的内容
-    code = loadResult
+    code = loadResult as any
   }
 
   if (code == null) {
@@ -50,7 +50,7 @@ async function loadAndTransform(url: string, server: ViteDevServer, resolved?: s
 
   const transformResult = await pluginContainer!.transform(code, fileUrl)
 
-  code = transformResult || code
+  code = (transformResult || code) as any
 
   return {
     code,

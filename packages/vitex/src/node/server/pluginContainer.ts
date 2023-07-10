@@ -1,5 +1,5 @@
 import { join } from 'node:path'
-import type { TransformResult, ViteDevServer } from '.'
+import type { TransformResult, ViteDevServer } from 'vite'
 
 export interface PluginContainer {
   buildStart(options: any): Promise<void>
@@ -9,7 +9,7 @@ export interface PluginContainer {
 }
 
 export function createPluginContainer(server: ViteDevServer): PluginContainer {
-  const { plugins, root } = server
+  const { plugins, root } = server as any
   const container: PluginContainer = {
     // 立即执行，执行各个plugin的options钩子，内部也会根据options的order进行排序
     // 异步，串行
@@ -56,7 +56,7 @@ export function createPluginContainer(server: ViteDevServer): PluginContainer {
 
     // 异步串行
     async transform(code, id) {
-      for (const plugin of server.plugins) {
+      for (const plugin of (server as any).plugins) {
         if (!plugin.transform)
           continue
         let result: TransformResult | null = null
@@ -70,7 +70,7 @@ export function createPluginContainer(server: ViteDevServer): PluginContainer {
         if (!result)
           continue
         // 如果有返回值，用结果覆盖 code，作为入参传给下一个 transform 钩子
-        code = result
+        code = result as any
       }
       return code
     },

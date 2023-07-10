@@ -14,7 +14,8 @@ export function lessPlugin(): Plugin {
   return {
     name: 'da',
     configureServer(server) {
-      server.middlewares.use(lessMiddleware())
+      // server.middlewares.use(lessMiddleware())
+      lessMiddleware()
     },
   }
 }

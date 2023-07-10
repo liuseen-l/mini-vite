@@ -1,10 +1,11 @@
 import path from 'node:path'
 import { transform } from 'esbuild'
-import type { Plugin } from '../server'
+import type { Plugin } from 'vite'
 import { isJSRequest } from '../utils'
 
 export function esbuildPlugin(): Plugin {
   return {
+    name: 'vite-esbuild',
     async transform(code, url) {
       if (isJSRequest(url)) {
         const extname = path.extname(url).slice(1)

@@ -1,10 +1,11 @@
-import type { Plugin } from '../server'
+import type { Plugin } from 'vite'
 import { staticMiddleware } from '../server/middlewares/static'
 
 export function staticPlugin(): Plugin {
   return {
+    name: 'vite-static',
     configureServer(server) {
-      server.app.use(staticMiddleware())
+      server.middlewares.use(staticMiddleware())
     },
   }
 }
