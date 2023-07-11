@@ -1,31 +1,15 @@
 // import path from 'node:path'
 
 // import { resolvePlugins } from '../plugins'
-import type { InlineConfig, ViteDevServer } from 'vite'
-import { resolveConfig } from 'vite'
+import type { InlineConfig } from 'vite'
+import { resolveConfig } from '../config'
+import { initDepsOptimizer } from '../../node/optimizer/optimizer'
 
 // import { resolveConfig } from '../config'
 
 // import { transformMiddleware } from './middlewares/transform'
 
 // import { createPluginContainer } from './pluginContainer'
-
-export type ServerHook = (server: ViteDevServer) => (() => void) | void | Promise<(() => void) | void>
-
-export type TransformResult = string | null | void
-
-export type TransformHook = (code: string, id: string) => Promise<TransformResult> | TransformResult
-
-export type ResolveId = (id: string, importer?: string) => Promise<any | null>
-
-export type Load = (id: string) => Promise<any>
-
-export interface Plugin {
-  configureServer?: ServerHook
-  transform?: TransformHook
-  resolveId?: ResolveId
-  load?: Load
-}
 
 export function createServer(inlineConfig: InlineConfig = {}): Promise<void> {
   return _createServer(inlineConfig, { ws: true })
@@ -35,7 +19,20 @@ export async function _createServer(
   inlineConfig: InlineConfig = {},
   options: { ws: boolean },
 ) {
-  const config = await resolveConfig(inlineConfig, 'serve')
+  const config = await resolveConfig(inlineConfig)
+  console.log(config)
+
+  let initingServer: Promise<void> | undefined
+  const initServer = async () => {
+    initingServer = (async function () {
+      // await container.buildStart({})
+      // start deps optimizer after all container plugins are ready
+      // 依赖预构建入口
+      await initDepsOptimizer(config)
+      initingServer = undefined
+    })()
+    return initingServer
+  }
 
   // if (!config)
   //   return

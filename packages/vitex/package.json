@@ -22,8 +22,7 @@
     "dist",
     "types"
   ],
-  "scripts": {
-  },
+  "scripts": {},
   "dependencies": {
     "@types/node": "^18.0.0",
     "@types/postcss-import": "^14.0.0",
@@ -43,10 +42,10 @@
     "@types/connect": "^3.4.35",
     "cac": "^6.7.14",
     "conventional-changelog": "^3.1.25",
-    "esbuild": "^0.14.47",
+    "esbuild": "^0.18.11",
+    "fast-glob": "^3.3.0",
     "magic-string": "^0.30.1",
     "rollup": "^3.25.2",
-    "tsup": "^6.1.2",
     "typescript": "^4.4.3",
     "vite": "^4.4.2"
   },
