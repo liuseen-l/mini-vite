@@ -1,9 +1,7 @@
-import { defineConfig } from 'vitex'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-
-import { lessPlugin } from './plugins/less'
 
 export default defineConfig({
   // plugins: [lessPlugin()],
-  plugins: [vue(), lessPlugin()],
+  plugins: [vue()],
 })

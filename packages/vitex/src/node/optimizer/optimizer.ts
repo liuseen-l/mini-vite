@@ -1,5 +1,4 @@
 import type { ResolvedConfig, ViteDevServer } from 'vite'
-import { build } from 'esbuild'
 import { discoverProjectDependencies, runOptimizeDeps } from './index'
 
 async function createDepsOptimizer(
@@ -7,10 +6,10 @@ async function createDepsOptimizer(
   server?: ViteDevServer,
 ): Promise<void> {
   const discover = discoverProjectDependencies(config)
-  const deps = await discover.result
-
-  const result = await runOptimizeDeps(config, deps)
-  console.log(result)
+  const deps = await discover.result;
+  (config as any).optimizeDep = deps
+  console.log(deps)
+  runOptimizeDeps(config, deps)
 }
 
 export async function initDepsOptimizer(
@@ -18,16 +17,4 @@ export async function initDepsOptimizer(
   server?: ViteDevServer,
 ): Promise<void> {
   await createDepsOptimizer(config, server)
-}
-
-export async function extractExportsData(
-  filePath: string,
-): Promise<any> {
-  const result = await build({
-    entryPoints: [filePath],
-    write: false,
-    format: 'esm',
-  })
-
-  return result
 }

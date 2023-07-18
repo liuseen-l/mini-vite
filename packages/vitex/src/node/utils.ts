@@ -6,6 +6,9 @@ import { exec } from 'node:child_process'
 import { createFilter as _createFilter } from '@rollup/pluginutils'
 import type { Alias, AliasOptions } from 'vite'
 
+/// dadwadwadwadwad
+// src/node/utils.ts
+
 const knownJsSrcRE = /\.((j|t)sx?)$/
 export function isJSRequest(url: string): boolean {
   url = cleanUrl(url)

@@ -1,15 +1,18 @@
 // import path from 'node:path'
 
 // import { resolvePlugins } from '../plugins'
+import path from 'node:path'
 import type { InlineConfig } from 'vite'
+import connect from 'connect'
 import { resolveConfig } from '../config'
 import { initDepsOptimizer } from '../../node/optimizer/optimizer'
+
+import { createPluginContainer } from './pluginContainer'
+import { transformMiddleware } from './middlewares/transform'
 
 // import { resolveConfig } from '../config'
 
 // import { transformMiddleware } from './middlewares/transform'
-
-// import { createPluginContainer } from './pluginContainer'
 
 export function createServer(inlineConfig: InlineConfig = {}): Promise<void> {
   return _createServer(inlineConfig, { ws: true })
@@ -20,42 +23,35 @@ export async function _createServer(
   options: { ws: boolean },
 ) {
   const config = await resolveConfig(inlineConfig)
-  console.log(config)
 
-  let initingServer: Promise<void> | undefined
   const initServer = async () => {
-    initingServer = (async function () {
-      // await container.buildStart({})
-      // start deps optimizer after all container plugins are ready
+    return (async function () {
       // 依赖预构建入口
       await initDepsOptimizer(config)
-      initingServer = undefined
     })()
-    return initingServer
+  }
+  initServer()
+
+  if (!config)
+    return
+
+  const app = connect()
+
+  // server 作为上下文对象，用于保存一些状态和对象，将会在 Server 的各个流程中被使用
+  let server: any = {
+    app,
+    config,
+    root: path.resolve(__dirname, '../../../playground'),
   }
 
-  // if (!config)
-  //   return
+  const container = createPluginContainer(config)
 
-  // const plugins = [...(config.plugins || []), ...resolvePlugins()]
-  // const app = connect()
+  server = {
+    ...server,
+    pluginContainer: container,
+  }
 
-  // // server 作为上下文对象，用于保存一些状态和对象，将会在 Server 的各个流程中被使用
-  // let server: ViteDevServer = {
-  //   plugins,
-  //   app,
-  //   config,
-  //   root: path.resolve(__dirname, '../../../playground'),
-  // }
-
-  // const container = createPluginContainer(server)
-
-  // server = {
-  //   ...server,
-  //   pluginContainer: container,
-  // }
-
-  // app.use(transformMiddleware(server))
+  app.use(transformMiddleware(server))
 
   // for (const plugin of plugins) plugin?.configureServer?.(server)
 
