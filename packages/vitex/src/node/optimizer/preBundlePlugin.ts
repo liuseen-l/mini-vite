@@ -5,11 +5,8 @@ import { init, parse } from 'es-module-lexer'
 import type { Loader, Plugin } from 'esbuild'
 import resolve from 'resolve'
 import fs from 'fs-extra'
-import createDebug from 'debug'
 import { BARE_IMPORT_RE } from '../constants'
 import { normalizePath } from '../utils'
-
-const debug = createDebug('dev')
 
 const _require = createRequire(import.meta.url)
 export function preBundlePlugin(deps: Record<string, string>): Plugin {

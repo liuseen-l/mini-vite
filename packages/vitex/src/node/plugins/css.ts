@@ -8,7 +8,7 @@ import { isLessRequest } from '../../../../../playground/plugins/less'
 
 export function cssPlugin(): Plugin {
   return {
-    name: 'vite-css',
+    name: 'vitex:css',
     async transform(code, url) {
       if (isCSSRequest(url)) {
         const file = url.startsWith('/') ? `.${url}` : url
@@ -35,7 +35,7 @@ export function cssPlugin(): Plugin {
 
 export function cssPostPlugin(): Plugin {
   return {
-    name: 'da',
+    name: 'vitex:postCss',
     async transform(code, url) {
       if (isCSSRequest(url)) {
         return `

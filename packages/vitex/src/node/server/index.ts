@@ -1,63 +1,55 @@
-// import path from 'node:path'
-
-// import { resolvePlugins } from '../plugins'
-import path from 'node:path'
-import type { InlineConfig } from 'vite'
+import type { InlineConfig, ViteDevServer } from 'vite'
 import connect from 'connect'
-import { resolveConfig } from '../config'
-import { initDepsOptimizer } from '../../node/optimizer/optimizer'
 
+// import { initDepsOptimizer } from '../../node/optimizer/optimizer'
+import { resolveConfig } from '../config'
+
+// import { indexHtmlMiddware } from './middlewares/indexHtml'
 import { createPluginContainer } from './pluginContainer'
 import { transformMiddleware } from './middlewares/transform'
+import { serveStaticMiddleware } from './middlewares/static'
 
-// import { resolveConfig } from '../config'
-
-// import { transformMiddleware } from './middlewares/transform'
-
-export function createServer(inlineConfig: InlineConfig = {}): Promise<void> {
-  return _createServer(inlineConfig, { ws: true })
+export function createServer(inlineConfig: InlineConfig = {}): Promise<Partial<ViteDevServer> > {
+  return _createServer(inlineConfig)
 }
 
 export async function _createServer(
   inlineConfig: InlineConfig = {},
-  options: { ws: boolean },
 ) {
   const config = await resolveConfig(inlineConfig)
 
-  const initServer = async () => {
-    return (async function () {
-      // 依赖预构建入口
-      await initDepsOptimizer(config)
-    })()
-  }
-  initServer()
+  // const initServer = async () => {
+  //   return (async function () {
+  //     // 依赖预构建入口
+  //     await initDepsOptimizer(config)
+  //   })()
+  // }
+  // initServer()
 
-  if (!config)
-    return
-
-  const app = connect()
+  const middlewares = connect()
 
   // server 作为上下文对象，用于保存一些状态和对象，将会在 Server 的各个流程中被使用
-  let server: any = {
-    app,
+  let server: Partial<ViteDevServer> = {
+    middlewares,
     config,
-    root: path.resolve(__dirname, '../../../playground'),
   }
 
   const container = createPluginContainer(config)
 
   server = {
     ...server,
-    pluginContainer: container,
+    pluginContainer: container as any,
   }
 
-  app.use(transformMiddleware(server))
+  //
+  for (const plugin of config.plugins) {
+    if (plugin.configureServer)
+      await (plugin as any).configureServer(server)
+  }
 
-  // for (const plugin of plugins) plugin?.configureServer?.(server)
+  middlewares.use(transformMiddleware(server))
+  // middlewares.use(indexHtmlMiddware(server))
+  middlewares.use(serveStaticMiddleware())
 
-  // app.listen(3000, () => {
-  //   console.log('服务启动')
-  // })
-
-  // console.log('open http://localhost:3000/')
+  return server
 }

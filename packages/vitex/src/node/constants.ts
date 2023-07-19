@@ -1,4 +1,4 @@
-import { resolve } from 'node:path'
+import path, { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 export const DEFAULT_CONFIG_FILES = [
@@ -9,7 +9,7 @@ export const DEFAULT_CONFIG_FILES = [
   'vite.config.mts',
   'vite.config.cts',
 ]
-
+export const PRE_BUNDLE_DIR = path.join('node_modules', '.m-vite')
 export const DEFAULT_EXTENSIONS = [
   '.mjs',
   '.js',
@@ -19,7 +19,7 @@ export const DEFAULT_EXTENSIONS = [
   '.tsx',
   '.json',
 ]
-
+export const DEFAULT_EXTERSIONS = ['.tsx', '.ts', '.jsx', 'js']
 export const VITE_PACKAGE_DIR = resolve(
   // import.meta.url is `dist/node/constants.js` after bundle
   fileURLToPath(import.meta.url),
@@ -58,3 +58,4 @@ export const EXTERNAL_TYPES = [
   'webp',
   'avif',
 ]
+export const CLIENT_PUBLIC_PATH = '/@vite/client'

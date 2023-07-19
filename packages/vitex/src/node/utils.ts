@@ -5,9 +5,22 @@ import { builtinModules, createRequire } from 'node:module'
 import { exec } from 'node:child_process'
 import { createFilter as _createFilter } from '@rollup/pluginutils'
 import type { Alias, AliasOptions } from 'vite'
+import { CLIENT_PUBLIC_PATH } from './constants'
 
 /// dadwadwadwadwad
 // src/node/utils.ts
+export function removeImportQuery(url: string): string {
+  return url.replace(/\?import$/, '')
+}
+
+const INTERNAL_LIST = [CLIENT_PUBLIC_PATH, '/@react-refresh']
+export function isInternalRequest(url: string): boolean {
+  return INTERNAL_LIST.includes(url)
+}
+
+export function getShortName(file: string, root: string) {
+  return file.startsWith(`${root}/`) ? path.posix.relative(root, file) : file
+}
 
 const knownJsSrcRE = /\.((j|t)sx?)$/
 export function isJSRequest(url: string): boolean {

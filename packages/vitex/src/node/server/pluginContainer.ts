@@ -13,7 +13,7 @@ export interface PluginContainer {
 }
 
 export function createPluginContainer(config: ResolvedConfig): PluginContainer {
-  const { plugins, root, server } = config
+  const { root, server } = config
 
   class Context implements Partial<RollupPluginContext> {
     async resolve(id: string, importer?: string) {
@@ -28,14 +28,14 @@ export function createPluginContainer(config: ResolvedConfig): PluginContainer {
     // 异步，串行
     // 等会sercer/index.ts中会进行调用
     async buildStart() {
-      for (const plugin of plugins) (plugin as any)?.configureServer?.(server)
+      for (const plugin of config.plugins) (plugin as any)?.configureServer?.(server)
     },
 
     // 异步，first优先
     async resolveId(rawId, importer = join(root, 'index.html')) {
       let id: string | null = null
       const ctx = new Context() as any
-      for (const plugin of plugins) {
+      for (const plugin of config.plugins) {
         if (!plugin.resolveId)
           continue
         let result
@@ -57,7 +57,7 @@ export function createPluginContainer(config: ResolvedConfig): PluginContainer {
     // 异步，first优先
     async load(id) {
       const ctx = new Context() as any
-      for (const plugin of plugins) {
+      for (const plugin of config.plugins) {
         if (!plugin.load)
           continue
         const result = await (plugin.load as any).call(ctx, id)
@@ -86,7 +86,10 @@ export function createPluginContainer(config: ResolvedConfig): PluginContainer {
         if (!result)
           continue
         // 如果有返回值，用结果覆盖 code，作为入参传给下一个 transform 钩子
-        code = result as any
+        if (result.code)
+          code = result.code
+        else
+          code = result as any
       }
       return code
     },

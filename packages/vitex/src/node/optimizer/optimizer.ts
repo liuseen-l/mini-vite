@@ -8,7 +8,6 @@ async function createDepsOptimizer(
   const discover = discoverProjectDependencies(config)
   const deps = await discover.result;
   (config as any).optimizeDep = deps
-  console.log(deps)
   runOptimizeDeps(config, deps)
 }
 
