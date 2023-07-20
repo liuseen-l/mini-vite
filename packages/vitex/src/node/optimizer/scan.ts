@@ -1,4 +1,5 @@
 import path from 'node:path'
+import fs from 'node:fs'
 import { type ResolvedConfig } from 'vite'
 import esbuild from 'esbuild'
 import type { Plugin } from 'esbuild'
@@ -72,8 +73,10 @@ export function scanImports(config: ResolvedConfig): {
   }>
 } {
   const deps: Record<string, string> = {}
+  // 生成扫描后的esbuild上下文
   const esbuildContext = prepareEsbuildScanner(config, deps)
   const result = esbuildContext.then((context) => {
+    // context实例上调用rebuild方法，返回promise，promise的值为扫描到的所有依赖deps
     function disposeContext() {
       return context?.dispose().catch((e: Error) => {
         config.logger.error('Failed to dispose esbuild context', { error: e })
@@ -101,14 +104,24 @@ async function prepareEsbuildScanner(
   deps: Record<string, string>,
 ): Promise<any | undefined> {
   // const container = await createPluginContainer(config)
-
   // const plugin = esbuildScanPlugin(container, deps)
+
+  // 生成esbuild插件，用于记录项目当中的三方依赖
   const plugin = esbuildScanPlugin(deps)
-  console.log(config.root)
+
+  let entry = ''
+  // 我们这里找一下入口，优先级为ts tsx js
+  for (const i of ['ts', 'tsx', 'js']) {
+    const entryPath = path.resolve(config.root, `src/main.${i}`)
+    if (fs.existsSync(entryPath)) {
+      entry = entryPath
+      break
+    }
+  }
 
   return await esbuild.context({
     absWorkingDir: process.cwd(),
-    entryPoints: [path.resolve(config.root, 'src/main.tsx')],
+    entryPoints: [entry],
     write: false,
     bundle: true,
     plugins: [plugin],

@@ -63,7 +63,7 @@ export async function resolveConfig(
   //     .map(hook => hook(workerResolved)),
   // ])
   const config = await _reresolveConfig(inlineConfig, 'serve');
-
+  // 过滤掉vite自身的插件，我们自己手动实现，并合并我们内置的vitex插件
   (config as any).plugins = [...(config.plugins.filter((p) => {
     return p.name.includes('vitex:')
   }) || []), ...resolvePlugins()]
