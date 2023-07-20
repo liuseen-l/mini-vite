@@ -111,7 +111,7 @@ async function prepareEsbuildScanner(
 
   let entry = ''
   // 我们这里找一下入口，优先级为ts tsx js
-  for (const i of ['ts', 'tsx', 'js']) {
+  for (const i of ['ts', 'tsx', 'js', 'jsx']) {
     const entryPath = path.resolve(config.root, `src/main.${i}`)
     if (fs.existsSync(entryPath)) {
       entry = entryPath

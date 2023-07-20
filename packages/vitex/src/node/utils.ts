@@ -172,7 +172,9 @@ function optimizeSafeRealPathSync() {
       safeRealpathSync = windowsMappedRealpathSync
   })
 }
-
+export function isImportRequest(url: string): boolean {
+  return url.endsWith('?import')
+}
 export type FilterPattern =
   | ReadonlyArray<string | RegExp>
   | string

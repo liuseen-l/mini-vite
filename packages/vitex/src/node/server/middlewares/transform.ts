@@ -1,6 +1,6 @@
 import type { NextHandleFunction } from 'connect'
 import type { ViteDevServer } from 'vite'
-import { cleanUrl, isCSSRequest, isJSRequest } from '../../utils'
+import { isCSSRequest, isImportRequest, isJSRequest } from '../../utils'
 import { transformRequest } from '../transformRequest'
 
 export function transformMiddleware(server: Partial<ViteDevServer>): NextHandleFunction {
@@ -8,13 +8,11 @@ export function transformMiddleware(server: Partial<ViteDevServer>): NextHandleF
     if (req.method !== 'GET')
       return next()
 
-    const url = cleanUrl(req.url!)
+    const url = req.url!
 
-    if (isJSRequest(url) || isCSSRequest(url)) {
-      // resolve the module path
-      // const file = url.startsWith('/') ? `.${url}` : url
-      console.log(url)
-
+    // 在中间件中先判断一下当前引入的模块是否为需要处理的模块
+    if (isJSRequest(url) || isCSSRequest(url) || isImportRequest(url)) {
+      // /src/main.ts中才有svg，因此 /src/main.ts的时候能进入这里，执行完之后svg会被重写，添加?import，因此当请求到?import的时候也会走就来
       const result = await transformRequest(url, server)
 
       if (!result)

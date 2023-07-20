@@ -1,9 +1,12 @@
 // @ts-expect-error 必须要用后置，因为 server 没做自动加后缀的兼容
 import { subModule } from './sub-module.ts'
+import logo from './logo.svg'
 
 // @ts-expect-error
 import { ReactComponent } from './react-component.tsx'
 import './style/style.css'
+
+console.log(logo)
 
 // import './style/less-test.less'
 

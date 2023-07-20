@@ -5,15 +5,19 @@ import type { Plugin } from 'vite'
 import { esbuildPlugin } from './esbuild'
 import { cssPlugin, cssPostPlugin } from './css'
 
-// import { importAnalysisPlugin } from './importAnalysis'
+import { importAnalysisPlugin } from './importAnalysis'
 import { resolvePlugin } from './resolve'
-
-// import { cssPlugin, cssPostPlugin } from './css'
-// import { staticPlugin } from './static'
-// import { esbuildPlugin } from './esbuild'
+import { assetPlugin } from './asstes'
 
 export function resolvePlugins(): Plugin[] {
-  return [resolvePlugin(), esbuildPlugin(), cssPlugin(), cssPostPlugin()]
+  return [
+    resolvePlugin(),
+    esbuildPlugin(),
+    importAnalysisPlugin(),
+    cssPlugin(),
+    cssPostPlugin(),
+    assetPlugin(),
+  ]
 }
 
 export function getSortedPluginsByHook(
