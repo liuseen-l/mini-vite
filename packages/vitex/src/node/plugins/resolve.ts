@@ -5,6 +5,7 @@ import type { Plugin, ViteDevServer } from 'vite'
 import { DEFAULT_EXTERSIONS } from '../constants'
 import { cleanUrl, isInternalRequest, normalizePath, removeImportQuery } from '../utils'
 
+// 返回模块的绝对路径
 export function resolvePlugin(): Plugin {
   let serverContext: ViteDevServer
   return {

@@ -1,9 +1,10 @@
-import type { InlineConfig, ViteDevServer } from 'vite'
+import type { InlineConfig, ViteDevServer, ModuleGraph as _ModuleGraph } from 'vite'
 import connect from 'connect'
 import { initDepsOptimizer } from '../../node/optimizer/optimizer'
 import { resolveConfig } from '../config'
 
 // import { indexHtmlMiddware } from './middlewares/indexHtml'
+import { ModuleGraph } from '../moduleGraph'
 import { createPluginContainer } from './pluginContainer'
 import { transformMiddleware } from './middlewares/transform'
 import { serveStaticMiddleware } from './middlewares/static'
@@ -38,8 +39,11 @@ export async function _createServer(
   // 生成插件容器，通过调用容器方法，调用各个插件的钩子
   const container = createPluginContainer(config)
 
+  const moduleGraph = new ModuleGraph(url => container.resolveId(url)) as any as _ModuleGraph
+
   server = {
     ...server,
+    moduleGraph,
     pluginContainer: container as any,
   }
 

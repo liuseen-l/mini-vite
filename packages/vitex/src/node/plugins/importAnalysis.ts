@@ -1,12 +1,15 @@
 // 新建 src/node/plugins/importAnalysis.ts
+import path from 'node:path'
 import { init, parse } from 'es-module-lexer'
 import MagicString from 'magic-string'
 import type { Plugin, ViteDevServer } from 'vite'
 import {
+  cleanUrl,
   getShortName,
   isJSRequest,
   normalizePath,
 } from '../utils'
+import { BARE_IMPORT_RE, CLIENT_PUBLIC_PATH, PRE_BUNDLE_DIR } from '../constants'
 
 // 在esbuildPlugin将 tsx ts 转换为浏览器可以识别的语法之后，是不是就可以直接返回给浏览器执行了呢？
 // 显然不是，我们还考虑如下的一些问题:
@@ -47,6 +50,11 @@ export function importAnalysisPlugin(): Plugin {
         return resolvedId
       }
 
+      // 用于缓存三方模块
+      const { moduleGraph } = serverContext
+      const curMod = moduleGraph.getModuleById(id)!
+      const importedModules = new Set<string>()
+
       // 对每一个 import 语句依次进行分析
       for (const importInfo of imports) {
         // 举例说明: const str = `import React from 'react'`
@@ -58,23 +66,36 @@ export function importAnalysisPlugin(): Plugin {
         if (modSource.endsWith('.svg')) {
           // 加上 ?import 后缀，并将window改为unix风格，且改为绝对路径
           const resolvedUrl = await resolve(modSource, id)
-
           ms.overwrite(modStart, modEnd, `${resolvedUrl}?import`)
           continue
         }
         // // 第三方库: 路径重写到预构建产物的路径
-        // if (BARE_IMPORT_RE.test(modSource)) {
-        //   const bundlePath = normalizePath(
-        //     path.join('/', PRE_BUNDLE_DIR, `${modSource}.js`),
-        //   )
-        //   ms.overwrite(modStart, modEnd, bundlePath)
-        // }
-        // else if (modSource.startsWith('.') || modSource.startsWith('/')) {
-        //   // 直接调用插件上下文的 resolve 方法，会自动经过路径解析插件的处理
-        //   const resolved = await this.resolve(modSource, id)
-        //   if (resolved)
-        //     ms.overwrite(modStart, modEnd, resolved.id)
-        // }
+        if (BARE_IMPORT_RE.test(modSource)) {
+          const bundlePath = normalizePath(
+            path.join('/', PRE_BUNDLE_DIR, `${modSource}.js`),
+          )
+          importedModules.add(bundlePath)
+          // ms.overwrite(modStart, modEnd, bundlePath)
+        }
+        else if (modSource.startsWith('.') || modSource.startsWith('/')) {
+          // 直接调用插件上下文的 resolve 方法，会自动经过路径解析插件的处理
+          const resolved = await this.resolve(modSource, id) as any as string
+          if (resolved) {
+            // ms.overwr  ite(modStart, modEnd, resolved.id)
+            importedModules.add(resolved)
+          }
+        }
+      }
+
+      // 只对业务源码注入
+      if (!id.includes('node_modules')) {
+        // 注入 HMR 相关的工具函数
+        ms.prepend(
+          `import { createHotContext as __vite__createHotContext } from "${CLIENT_PUBLIC_PATH}";`
+          + `import.meta.hot = __vite__createHotContext(${JSON.stringify(
+            cleanUrl(curMod.url),
+          )});`,
+        )
       }
       return {
         code: ms.toString(),
