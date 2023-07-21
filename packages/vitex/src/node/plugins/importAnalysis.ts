@@ -23,6 +23,7 @@ export function importAnalysisPlugin(): Plugin {
       // 保存服务端上下文
       serverContext = s
     },
+    // id是绝对路径
     async transform(code: string, id: string) {
       // 只处理 JS 相关的请求
       if (!isJSRequest(id))

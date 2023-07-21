@@ -13,6 +13,7 @@ export function resolvePlugin(): Plugin {
     configureServer(s) {
       serverContext = s
     },
+    // id是不是文件绝对路径 /src/main.ts
     async resolveId(id: string, importer?: string) {
       id = removeImportQuery(cleanUrl(id))
 

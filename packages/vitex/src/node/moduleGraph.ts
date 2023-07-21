@@ -45,6 +45,7 @@ export class ModuleGraph {
   async ensureEntryFromUrl(rawUrl: string): Promise<ModuleNode> {
     // url为请求路径 /src/main.ts ，resolveId为绝对路径
     const { url, resolvedId } = await this._resolve(rawUrl)
+
     // 首先检查缓存
     if (this.urlToModuleMap.has(url))
       return this.urlToModuleMap.get(url) as ModuleNode
