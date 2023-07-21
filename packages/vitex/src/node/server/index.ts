@@ -1,5 +1,6 @@
 import type { InlineConfig, ViteDevServer, ModuleGraph as _ModuleGraph } from 'vite'
 import connect from 'connect'
+
 import { initDepsOptimizer } from '../../node/optimizer/optimizer'
 import { resolveConfig } from '../config'
 

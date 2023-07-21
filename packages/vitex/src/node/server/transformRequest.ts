@@ -20,8 +20,8 @@ async function doTransform(url: string, server: Partial<ViteDevServer>) {
   const cached
     = module && (module.transformResult)
 
-  if (cached)
-    return cached
+  // if (cached)
+  //   return cached
 
   // 原则上需要通过判断当前的模块是不是第三方模块才执行resolveId,但在这里我们都执行了
   // const resolved = (await pluginContainer!.resolveId(url, undefined)) ?? undefined
@@ -30,7 +30,7 @@ async function doTransform(url: string, server: Partial<ViteDevServer>) {
     : (await pluginContainer!.resolveId(url, undefined)) ?? undefined
 
   // F:\forProjects\mini-vite\playground\src\main.ts 这种路径
-  console.log(resolved)
+  // console.log(resolved)
 
   // resolve
   const id = (module?.id ?? resolved ?? url) as string
@@ -82,6 +82,11 @@ async function loadAndTransform(url: string, server: Partial<ViteDevServer>, mod
   const transformResult = await pluginContainer!.transform(code, fileUrl)
 
   code = (transformResult || code) as any
+
+  // 缓存模块的transformResult，就是代码片段
+  if (mod)
+    mod.transformResult = code
+  // console.log(mod)
 
   return {
     code,

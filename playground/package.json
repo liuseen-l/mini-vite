@@ -17,6 +17,7 @@
   "devDependencies": {
     "@types/less": "^3.0.0",
     "@vitejs/plugin-vue": "^4.2.3",
+    "lodash-es": "^4.17.21",
     "vite": "^4.4.2"
   }
 }

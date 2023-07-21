@@ -9,7 +9,7 @@ export const DEFAULT_CONFIG_FILES = [
   'vite.config.mts',
   'vite.config.cts',
 ]
-export const PRE_BUNDLE_DIR = path.join('node_modules', '.m-vite')
+export const PRE_BUNDLE_DIR = path.join('node_modules', '.vitex-bundle')
 export const DEFAULT_EXTENSIONS = [
   '.mjs',
   '.js',

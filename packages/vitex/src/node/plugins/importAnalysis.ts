@@ -47,6 +47,7 @@ export function importAnalysisPlugin(): Plugin {
         // if (mod && mod.lastHMRTimestamp > 0) {
         // resolvedId += "?t=" + mod.lastHMRTimestamp;
         // }
+
         return resolvedId
       }
 
@@ -75,20 +76,22 @@ export function importAnalysisPlugin(): Plugin {
             path.join('/', PRE_BUNDLE_DIR, `${modSource}.js`),
           )
           importedModules.add(bundlePath)
-          // ms.overwrite(modStart, modEnd, bundlePath)
+          // 重写三方库路径
+          ms.overwrite(modStart, modEnd, bundlePath)
         }
         else if (modSource.startsWith('.') || modSource.startsWith('/')) {
           // 直接调用插件上下文的 resolve 方法，会自动经过路径解析插件的处理
-          const resolved = await this.resolve(modSource, id) as any as string
+          const resolved = await resolve(modSource, id) as any as string
           if (resolved) {
-            // ms.overwr  ite(modStart, modEnd, resolved.id)
+            // 重写业务代码路径，将相对路径转为项目绝对路径，./src/main.ts -> /src/main.ts
+            ms.overwrite(modStart, modEnd, resolved)
             importedModules.add(resolved)
           }
         }
       }
 
       // 只对业务源码注入
-      if (!id.includes('node_modules')) {
+      if (!id.includes('node_modules') && false) {
         // 注入 HMR 相关的工具函数
         ms.prepend(
           `import { createHotContext as __vite__createHotContext } from "${CLIENT_PUBLIC_PATH}";`

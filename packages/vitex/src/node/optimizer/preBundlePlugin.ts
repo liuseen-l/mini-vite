@@ -20,7 +20,6 @@ export function preBundlePlugin(deps: Record<string, string>): Plugin {
         (resolveInfo) => {
           const { path: id, importer } = resolveInfo
           const isEntry = !importer
-          console.log(id)
 
           // 命中需要预编译的依赖
           if (Object.values(deps).includes(id)) {
