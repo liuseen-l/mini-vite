@@ -22,10 +22,16 @@ export function getShortName(file: string, root: string) {
   return file.startsWith(`${root}/`) ? path.posix.relative(root, file) : file
 }
 
-const knownJsSrcRE = /\.((j|t)sx?)$/
-export function isJSRequest(url: string): boolean {
-  url = cleanUrl(url)
-  return knownJsSrcRE.test(url)
+const JS_TYPES_RE = /\.(?:j|t)sx?$|\.mjs$/
+export function isJSRequest(id: string): boolean {
+  id = cleanUrl(id)
+  if (JS_TYPES_RE.test(id))
+    return true
+
+  if (!path.extname(id) && !id.endsWith('/'))
+    return true
+
+  return false
 }
 
 const cssLangs = '\\.(css|less|sass|scss|styl|stylus|pcss|postcss)($|\\?)'

@@ -9,7 +9,6 @@ export function indexHtmlMiddware(
   return async (req, res, next) => {
     if (req.url === '/') {
       const { root, plugins } = serverContext.config
-      const { pluginContainer } = serverContext
       // 获取入口index.html
       const indexHtmlPath = path.join(root, 'index.html')
 
@@ -22,7 +21,7 @@ export function indexHtmlMiddware(
         for (const plugin of plugins) {
           if (plugin.transformIndexHtml)
             // 执行plugin的transformIndexHtml方法
-            html = await pluginContainer.transformIndexHtml(html)
+            html = await plugin.transformIndexHtml(html)
         }
         res.statusCode = 200
         res.setHeader('Content-Type', 'text/html')

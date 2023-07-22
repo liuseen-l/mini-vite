@@ -8,9 +8,11 @@ import { cssPlugin, cssPostPlugin } from './css'
 import { importAnalysisPlugin } from './importAnalysis'
 import { resolvePlugin } from './resolve'
 import { assetPlugin } from './asstes'
+import { clientInjectPlugin } from './clientInject'
 
 export function resolvePlugins(): Plugin[] {
   return [
+    clientInjectPlugin(),
     resolvePlugin(),
     esbuildPlugin(),
     importAnalysisPlugin(),

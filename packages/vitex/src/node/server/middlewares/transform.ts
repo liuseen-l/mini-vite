@@ -10,10 +10,12 @@ export function transformMiddleware(server: Partial<ViteDevServer>): NextHandleF
 
     // 这里clearUrl的话，isImport不会命中
     const url = req.url!
+    console.log(7, url)
 
     // 在中间件中先判断一下当前引入的模块是否为需要处理的模块
     if (isJSRequest(url) || isCSSRequest(url) || isImportRequest(url)) {
       // /src/main.ts中才有svg，因此 /src/main.ts的时候能进入这里，执行完之后svg会被重写，添加?import，因此当请求到?import的时候也会走就来
+
       const result = await transformRequest(url, server)
 
       if (!result)

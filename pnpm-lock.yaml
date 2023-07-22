@@ -7,6 +7,9 @@ importers:
       '@antfu/eslint-config':
         specifier: ^0.39.5
         version: 0.39.5(eslint@8.43.0)(typescript@5.1.3)
+      '@antfu/ni':
+        specifier: ^0.21.5
+        version: 0.21.5
       '@babel/core':
         specifier: ^7.22.5
         version: 7.22.5
@@ -179,9 +182,15 @@ importers:
       '@types/resolve':
         specifier: ^1.20.2
         version: 1.20.2
+      '@types/ws':
+        specifier: ^8.5.5
+        version: 8.5.5
       cac:
         specifier: ^6.7.14
         version: 6.7.14
+      chokidar:
+        specifier: ^3.5.3
+        version: 3.5.3
       conventional-changelog:
         specifier: ^3.1.25
         version: 3.1.25
@@ -215,6 +224,9 @@ importers:
       vite:
         specifier: ^4.4.2
         version: 4.4.2(@types/node@18.0.0)(less@4.1.3)
+      ws:
+        specifier: ^8.13.0
+        version: 8.13.0
 
   playground:
     dependencies:
@@ -370,6 +382,11 @@ packages:
       - jest
       - supports-color
       - typescript
+    dev: true
+
+  /@antfu/ni@0.21.5:
+    resolution: {integrity: sha512-rFmuqZMFa1OTRbxdu3vmfytsy1CtsIUFH0bO85rZ1xdu2uLoioSaEi6iOULDVTQUrnes50jMs+UW355Ndj7Oxg==}
+    hasBin: true
     dev: true
 
   /@babel/code-frame@7.22.5:
@@ -1417,6 +1434,12 @@ packages:
 
   /@types/unist@2.0.6:
     resolution: {integrity: sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==}
+    dev: true
+
+  /@types/ws@8.5.5:
+    resolution: {integrity: sha512-lwhs8hktwxSjf9UaZ9tG5M03PGogvFaH8gUgLNbN9HKIg0dvv6q+gkSuJ8HN4/VbyxkuLzCjlN7GquQ0gUJfIg==}
+    dependencies:
+      '@types/node': 20.3.1
     dev: true
 
   /@typescript-eslint/eslint-plugin@5.60.0(@typescript-eslint/parser@5.60.0)(eslint@8.43.0)(typescript@5.1.3):
@@ -6224,6 +6247,19 @@ packages:
     dependencies:
       imurmurhash: 0.1.4
       signal-exit: 3.0.7
+    dev: true
+
+  /ws@8.13.0:
+    resolution: {integrity: sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==}
+    engines: {node: '>=10.0.0'}
+    peerDependencies:
+      bufferutil: ^4.0.1
+      utf-8-validate: '>=5.0.2'
+    peerDependenciesMeta:
+      bufferutil:
+        optional: true
+      utf-8-validate:
+        optional: true
     dev: true
 
   /xml-name-validator@4.0.0:

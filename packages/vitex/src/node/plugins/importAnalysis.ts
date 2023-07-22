@@ -6,6 +6,7 @@ import type { Plugin, ViteDevServer } from 'vite'
 import {
   cleanUrl,
   getShortName,
+  isInternalRequest,
   isJSRequest,
   normalizePath,
 } from '../utils'
@@ -26,7 +27,7 @@ export function importAnalysisPlugin(): Plugin {
     // id是绝对路径
     async transform(code: string, id: string) {
       // 只处理 JS 相关的请求
-      if (!isJSRequest(id))
+      if (!isJSRequest(id) || isInternalRequest(id))
         return null
 
       await init
@@ -41,18 +42,18 @@ export function importAnalysisPlugin(): Plugin {
         if (!resolved)
           return
 
-        // const cleanedId = cleanUrl(resolved.id)
-        // const mod = moduleGraph.getModuleById(cleanedId)
+        const cleanedId = cleanUrl(resolved as any as string)
+        const mod = moduleGraph.getModuleById(cleanedId)
 
-        const resolvedId = `/${getShortName(resolved as any as string, serverContext.config.root)}`
-        // if (mod && mod.lastHMRTimestamp > 0) {
-        // resolvedId += "?t=" + mod.lastHMRTimestamp;
-        // }
+        let resolvedId = `/${getShortName(resolved as any as string, serverContext.config.root)}`
+        console.log(123, resolvedId)
+
+        if (mod && mod.lastHMRTimestamp > 0)
+          resolvedId += `?t=${mod.lastHMRTimestamp}`
 
         return resolvedId
       }
 
-      // 用于缓存三方模块
       const { moduleGraph } = serverContext
       const curMod = moduleGraph.getModuleById(id)!
       const importedModules = new Set<string>()
@@ -92,7 +93,7 @@ export function importAnalysisPlugin(): Plugin {
       }
 
       // 只对业务源码注入
-      if (!id.includes('node_modules') && false) {
+      if (!id.includes('node_modules')) {
         // 注入 HMR 相关的工具函数
         ms.prepend(
           `import { createHotContext as __vite__createHotContext } from "${CLIENT_PUBLIC_PATH}";`
