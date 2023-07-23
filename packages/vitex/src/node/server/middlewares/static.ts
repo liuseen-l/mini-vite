@@ -8,7 +8,6 @@ export function serveStaticMiddleware(): NextHandleFunction {
   const serveFromRoot = sirv('./', { dev: true })
   return async function viteServeStaticMiddleware(req, res, next) {
     serveFromRoot(req, res, next)
-
     // 不处理 ?import 请求
     if (isImportRequest(req.url!))
       return

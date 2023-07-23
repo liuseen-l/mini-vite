@@ -16,7 +16,8 @@ app!.innerText = 'Hello World'
 
 subModule(app!)
 const comp = ReactComponent()
+
 // @ts-expect-error
 const root = ReactDOM.createRoot(document.getElementById('react-root'))
 root.render(comp)
-console.log(1232)
+console.log(2135)

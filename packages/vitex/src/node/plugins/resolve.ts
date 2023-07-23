@@ -34,7 +34,6 @@ export function resolvePlugin(): Plugin {
       else if (id.startsWith('.')) {
         if (!importer)
           throw new Error('`importer` should not be undefined')
-
         const hasExtension = path.extname(id).length > 1
         let resolvedId: string
         // ./App.tsx

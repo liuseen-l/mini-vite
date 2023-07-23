@@ -94,8 +94,6 @@ export function createHotContext(ownerPath: string) {
 async function fetchUpdate({ path, timestamp }: Update) {
   const mod = hotModulesMap.get(path)
 
-  console.log(path, mod)
-
   if (!mod)
     return
 
