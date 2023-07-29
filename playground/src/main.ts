@@ -19,5 +19,6 @@ const comp = ReactComponent()
 
 // @ts-expect-error
 const root = ReactDOM.createRoot(document.getElementById('react-root'))
+
 root.render(comp)
 console.log(2135)

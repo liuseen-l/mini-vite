@@ -82,12 +82,25 @@ export class ModuleGraph {
   }
 
   // HMR 触发时会执行这个方法
+  // 将路径所对应模块的缓存清空，以及引入了该模块的上层模块的缓存也清空
+  /**
+   *
+   *  /src/main.ts（transformResult中引入了App.tsx）
+   *     | transformResult清空
+   *     | /src/App.tsx（如果这个文件变化了）
+   *       | transformResult清空
+   *
+   *
+   */
   invalidateModule(file: string) {
+    // 由于idToModuleMap 和 urlToModuleMap存入的模块是同一个对象，因此操作一个另一个也变了，因此只需操作一个
     const mod = this.idToModuleMap.get(file)
     if (mod) {
       // 更新时间戳
       mod.lastHMRTimestamp = Date.now()
+      // 这里设置为null，那么transformRequest当中判断是否命中缓存就会为否
       mod.transformResult = null
+      // 递归向上，将引入了该模块的上层代码的缓存也都清空
       mod.importers.forEach((importer) => {
         this.invalidateModule(importer.id!)
       })

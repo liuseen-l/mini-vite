@@ -1,5 +1,5 @@
 import type { ViteDevServer } from 'vite'
-import { getShortName, slash } from '../utils'
+import { getShortName, normalizePath } from '../utils'
 
 export function bindingHMREvents(serverContext: ViteDevServer) {
   const { watcher, ws } = serverContext
@@ -11,9 +11,6 @@ export function bindingHMREvents(serverContext: ViteDevServer) {
     const { moduleGraph } = serverContext
     // 清除模块依赖图中的缓存
     await moduleGraph.invalidateModule(file as any)
-    // F:\ => F:/
-    file = slash(file)
-
     // 向客户端发送更新信息
     ws.send({
       type: 'update',
@@ -21,8 +18,8 @@ export function bindingHMREvents(serverContext: ViteDevServer) {
         {
           type: 'js-update',
           timestamp: Date.now(),
-          path: `/${getShortName(file, root)}`,
-          acceptedPath: `/${getShortName(file, root)}`,
+          path: `/${getShortName(normalizePath(file), root)}`,
+          acceptedPath: `/${getShortName(normalizePath(file), root)}`,
         },
       ],
     })

@@ -46,7 +46,6 @@ export function importAnalysisPlugin(): Plugin {
         const mod = moduleGraph.getModuleById(cleanedId)
 
         let resolvedId = `/${getShortName(resolved as any as string, serverContext.config.root)}`
-        console.log(123, resolvedId)
 
         if (mod && mod.lastHMRTimestamp > 0)
           resolvedId += `?t=${mod.lastHMRTimestamp}`
@@ -102,6 +101,10 @@ export function importAnalysisPlugin(): Plugin {
           )});`,
         )
       }
+
+      // 比如/src/main.ts 引入了2个文件，那么这两件个文件都会被添加到 main.ts模块中的importModules当中
+      (moduleGraph as any).updateModuleInfo(curMod, importedModules)
+
       return {
         code: ms.toString(),
         // 生成 SourceMap

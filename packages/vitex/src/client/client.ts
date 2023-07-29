@@ -55,6 +55,7 @@ const hotModulesMap = new Map<string, HotModule>()
 // 不在生效的模块表
 const pruneMap = new Map<string, (data: any) => void | Promise<void>>()
 
+// ownerPath 就是/src/main.ts 这样的路径
 export function createHotContext(ownerPath: string) {
   const mod = hotModulesMap.get(ownerPath)
   if (mod)
@@ -81,6 +82,11 @@ export function createHotContext(ownerPath: string) {
       // 这里仅考虑接受自身模块更新的情况
       // import.meta.hot.accept()
       if (typeof deps === 'function' || !deps)
+        /**
+         * import.meta.hot.accept(() => {
+         *   ReactDOM.render(<App />, document.getElementById("root"));
+         * });
+         */
         acceptDeps([ownerPath], ([mod]) => deps && deps(mod))
     },
     // 模块不再生效的回调
@@ -100,15 +106,19 @@ async function fetchUpdate({ path, timestamp }: Update) {
   const moduleMap = new Map()
   const modulesToUpdate = new Set<string>()
 
+  // 更新的path
   modulesToUpdate.add(path)
 
   await Promise.all(
+    // dep 是路径
     Array.from(modulesToUpdate).map(async (dep) => {
       const [path, query] = dep.split('?')
       try {
+        // 动态请求该模块
         const newMod = await import(
           `${path}?t=${timestamp}${query ? `&${query}` : ''}`
         )
+        // 存储新的模块
         moduleMap.set(dep, newMod)
       }
       catch (e) { }
