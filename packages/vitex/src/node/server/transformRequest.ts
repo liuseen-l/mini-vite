@@ -41,7 +41,8 @@ async function doTransform(url: string, server: Partial<ViteDevServer>) {
     }
    *
    */
-
+  // if (url.includes('src/main'))
+  //   console.log(cached)
   if (cached) {
     return {
       code: cached,

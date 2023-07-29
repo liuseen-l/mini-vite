@@ -12,13 +12,14 @@ console.log(head([1, 2, 3]))
 // import './style/less-test.less'
 
 const app = document.getElementById('app')
-app!.innerText = 'Hello World'
+app!.innerText = 'Hello 12fa332orld'
 
 subModule(app!)
 const comp = ReactComponent()
 
 // @ts-expect-error
 const root = ReactDOM.createRoot(document.getElementById('react-root'))
-
+import.meta.hot.accept(() => {
+})
 root.render(comp)
 console.log(2135)

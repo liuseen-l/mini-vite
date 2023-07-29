@@ -25,9 +25,12 @@ async function handleMessage(payload: any) {
     case 'update':
       // 进行具体的模块更新
       payload.updates.forEach((update: Update) => {
-        if (update.type === 'js-update')
-          // console.log('hhhh')
-          fetchUpdate(update)
+        if (update.type === 'js-update') {
+          fetchUpdate(update).then((fn) => {
+            // 执行accept当中的回调函数
+            fn && fn()
+          })
+        }
         /**
           {
             type: 'js-update',
@@ -97,7 +100,7 @@ export function createHotContext(ownerPath: string) {
   }
 }
 
-async function fetchUpdate({ path, timestamp }: Update) {
+async function fetchUpdate({ path, timestamp }: Update): Promise<Function | void> {
   const mod = hotModulesMap.get(path)
 
   if (!mod)

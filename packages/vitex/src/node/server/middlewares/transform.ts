@@ -10,7 +10,6 @@ export function transformMiddleware(server: Partial<ViteDevServer>): NextHandleF
 
     // 这里clearUrl的话，isImport不会命中
     const url = req.url!
-    console.log(7, url)
 
     // 在中间件中先判断一下当前引入的模块是否为需要处理的模块
     if (isJSRequest(url) || isCSSRequest(url) || isImportRequest(url)) {
